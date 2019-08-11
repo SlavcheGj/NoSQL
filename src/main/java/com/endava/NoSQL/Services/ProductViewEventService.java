@@ -16,7 +16,7 @@ public interface ProductViewEventService {
     public void delete(ProductViewEvent productViewEvent);
     public Set<ProductViewEvent> findAll();
 
-    public Set<ProductViewEvent> findAllByIsTopPickClick(boolean isPicked);
+    public Set<ProductViewEvent> findAllByIsTopPickClick();
 
     public Set<ProductViewEvent> findAllByViewedProductItemPromotionId(Long id);
 }

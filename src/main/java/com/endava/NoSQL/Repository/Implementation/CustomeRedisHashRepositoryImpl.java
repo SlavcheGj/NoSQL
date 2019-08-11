@@ -32,9 +32,8 @@ public class CustomeRedisHashRepositoryImpl implements CustomRedisHashRepository
 
     @Override
     public boolean AddKeyValueForSortedSet(ProductViewEvent productViewEvent) {
-         zSetOperation.add(KEY_FOR_SORTED_SET,productViewEvent,productViewEvent.getDateTimeViewed().getTime());
 
-        return true;
+        return zSetOperation.add(KEY_FOR_SORTED_SET,productViewEvent,productViewEvent.getDateTimeViewed().getTime());
     }
 
     @Override
@@ -45,7 +44,6 @@ public class CustomeRedisHashRepositoryImpl implements CustomRedisHashRepository
         }else{
             return valueByRange.stream().map(o -> (ProductViewEvent)o).collect(Collectors.toSet());
         }
-        /*return zSetOperation.range(KEY_FOR_SORTED_SET,min,max).stream().map(o -> (ProductViewEvent)o).collect(Collectors.toSet());*/
     }
 
 

@@ -1,7 +1,6 @@
 package com.endava.NoSQL.Services;
 
 import com.endava.NoSQL.Model.ProductViewEvent;
-import com.endava.NoSQL.Repository.ProductItemRepository;
 import com.endava.NoSQL.Repository.ProductViewEventRepository;
 import org.springframework.stereotype.Service;
 
@@ -44,8 +43,8 @@ public class ProductViewEventServiceImp implements ProductViewEventService {
 
 
     @Override
-    public Set<ProductViewEvent> findAllByIsTopPickClick(boolean isPicked) {
-        return productViewEventRepository.findAllByIsTopPickClick(isPicked);
+    public Set<ProductViewEvent> findAllByIsTopPickClick() {
+        return productViewEventRepository.findAllByIsTopPickClick(true);
     }
 
     @Override

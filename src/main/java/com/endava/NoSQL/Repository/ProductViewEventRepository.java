@@ -16,7 +16,7 @@ public interface ProductViewEventRepository extends CrudRepository<ProductViewEv
     public void delete(ProductViewEvent productViewEvent);
     public Set<ProductViewEvent> findAll();
 
-    public Set<ProductViewEvent> findAllByIsTopPickClick(boolean isPicked);
+    public Set<ProductViewEvent> findAllByIsTopPickClick(boolean isTopPick);
 
     public Set<ProductViewEvent> findAllByViewedProductItemPromotionId(Long id);
 }

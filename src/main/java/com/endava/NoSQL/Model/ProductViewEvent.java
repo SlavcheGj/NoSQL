@@ -104,11 +104,9 @@ public class ProductViewEvent implements Serializable {
     public String toString() {
         return "ProductViewEvent{" +
                 "id=" + id +
-                ", viewedProductItem=" + viewedProductItem +
+                ", viewedProductItem=" + viewedProductItem.getProduct().getName() +
                 ", isRecommendationClick=" + isRecommendationClick +
                 ", isTopPickClick=" + isTopPickClick +
-                ", personalRecommendedProductItems=" + personalRecommendedProductItems +
-                ", topPicksProductItems=" + topPicksProductItems +
                 ", userId=" + userId +
                 ", dateTimeViewed=" + dateTimeViewed +
                 '}';

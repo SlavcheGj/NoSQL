@@ -7,6 +7,7 @@ import com.endava.NoSQL.Model.ProductViewEvent;
 import com.endava.NoSQL.Repository.ProductItemRepository;
 import com.endava.NoSQL.Repository.ProductRepository;
 import com.endava.NoSQL.Services.ProductViewEventServiceImp;
+import net.minidev.json.JSONUtil;
 import org.hibernate.validator.constraints.Range;
 import org.junit.Assert;
 import org.junit.Before;
@@ -33,9 +34,11 @@ public class ProductViewElementTest {
 
     @Autowired
     private ProductItemRepository productItemRepository;
+
     private Product createdProduct;
     private ProductItem createdProductItem;
     private ProductViewEvent createdProductViewEvent;
+    private ProductItem createdSecondProductItem;
 
 
     @Before
@@ -46,25 +49,30 @@ public class ProductViewElementTest {
         createdProductItem = new ProductItem(1L, 100, 2L, 10, createdProduct);
         productItemRepository.save(createdProductItem);
 
+        createdSecondProductItem = new ProductItem(2L, 100, 3L, 10, createdProduct);
+        productItemRepository.save(createdSecondProductItem);
+
         Set<ProductItem> personalReomendedProductItems = new HashSet<>();
         personalReomendedProductItems.add(createdProductItem);
+        personalReomendedProductItems.add(createdSecondProductItem);
         Set<ProductItem> topPicksProductItems = new HashSet<>();
         topPicksProductItems.add(createdProductItem);
 
-        createdProductViewEvent = new ProductViewEvent(3L, createdProductItem, true, true, personalReomendedProductItems, topPicksProductItems, 1, new Date());
-        productViewEventServiceImp.save(createdProductViewEvent);
-
-        createdProductViewEvent = new ProductViewEvent(4L, createdProductItem, true, true, personalReomendedProductItems, topPicksProductItems, 1, new Date());
-        productViewEventServiceImp.save(createdProductViewEvent);
-
         createdProductViewEvent = new ProductViewEvent(1L, createdProductItem, true, true, personalReomendedProductItems, topPicksProductItems, 1, new Date());
         productViewEventServiceImp.save(createdProductViewEvent);
+
+        productViewEventServiceImp.save(new ProductViewEvent(2L, createdSecondProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 1, new Date()));
+
+        productViewEventServiceImp.save(new ProductViewEvent(3L, createdProductItem, true, false, personalReomendedProductItems, topPicksProductItems, 1, new Date()));
+
+        productViewEventServiceImp.save(new ProductViewEvent(4L, createdProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 14, new Date()));
+
+        productViewEventServiceImp.save(new ProductViewEvent(5L, createdProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 14, new Date()));
+
     }
 
     @Test
     public void testProductCreate() {
-         /*createdProduct = new Product(1L, "Tech", "laptop", "Lenovo", "Work Laptop", Arrays.asList("fast", "great"));
-        productRepository.save(createdProduct);*/
 
         Product foundProduct = productRepository.findById(1L).get();
 
@@ -80,16 +88,11 @@ public class ProductViewElementTest {
     @Test
     public void testProductItemCreate() {
 
-        //Product product = productRepository.findById(1L).get();
-
-        /*createdProductItem = new ProductItem(1L, 100, 2L, 10, createdProduct);
-        productItemRepository.save(createdProductItem);*/
 
         ProductItem foundProductItem = productItemRepository.findById(1L).get();
 
         assertEquals(createdProductItem.getId(), foundProductItem.getId());
         assertEquals(createdProductItem.getPromotionId(), foundProductItem.getPromotionId());
-        //assertEquals(createdProductItem.getPrice(),foundProductItem.getPrice());
         assertEquals(createdProductItem.getInStockQuantity(), foundProductItem.getInStockQuantity());
         assertEquals(createdProductItem.getProduct().getId(), foundProductItem.getProduct().getId());
 
@@ -99,15 +102,6 @@ public class ProductViewElementTest {
     @Test
     public void testProductViewEventCreate() {
 
-        //ProductItem productItem = productItemRepository.findById(1L).get();
-
-        /*Set<ProductItem> personalReomendedProductItems = new HashSet<>();
-        personalReomendedProductItems.add(createdProductItem);
-        Set<ProductItem> topPicksProductItems = new HashSet<>();
-        topPicksProductItems.add(createdProductItem);
-
-         createdProductViewEvent = new ProductViewEvent(1L, productItem, true, true, personalReomendedProductItems, topPicksProductItems, 1, new Date());
-        productViewEventServiceImp.save(createdProductViewEvent);*/
 
         ProductViewEvent foundProductViewEvent = productViewEventServiceImp.findById(1L).get();
 
@@ -121,13 +115,16 @@ public class ProductViewElementTest {
 
     @Test
     public void testProductViewEventUpdate() {
+
         ProductViewEvent foundProductViewEvent = productViewEventServiceImp.findById(1L).get();
 
         ProductViewEvent updateFoundedProductViewEvent = productViewEventServiceImp.findById(1L).get();
+
         updateFoundedProductViewEvent.setUserId(2);
+
         productViewEventServiceImp.update(updateFoundedProductViewEvent);
+
         ProductViewEvent updatedFoundedProductViewEvent = productViewEventServiceImp.findById(1L).get();
-        System.out.println(updatedFoundedProductViewEvent.getUserId() + " " + foundProductViewEvent.getUserId());
 
         assertNotEquals(foundProductViewEvent.getUserId(), updatedFoundedProductViewEvent.getUserId());
     }
@@ -135,69 +132,52 @@ public class ProductViewElementTest {
     @Test
     public void testDeletingProductViewEvent() {
 
-        Set<ProductItem> personalReomendedProductItems = new HashSet<>();
-        personalReomendedProductItems.add(createdProductItem);
-        Set<ProductItem> topPicksProductItems = new HashSet<>();
-        topPicksProductItems.add(createdProductItem);
+        Optional<ProductViewEvent> productViewEvent = productViewEventServiceImp.findById(4l);
 
-        ProductViewEvent ProductViewEvent = new ProductViewEvent(2L, createdProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 14, new Date());
-        productViewEventServiceImp.save(ProductViewEvent);
-        int numObjects = productViewEventServiceImp.findAll().size();
-        assertEquals(numObjects, 4);
-        productViewEventServiceImp.delete(ProductViewEvent);
-        int numObjectsAfterDelete = productViewEventServiceImp.findAll().size();
-        assertEquals(numObjectsAfterDelete, 3);
+        int numberOfProductViewEventsInDatabaseBeforeDelete = productViewEventServiceImp.findAll().size();
+
+        assertEquals(numberOfProductViewEventsInDatabaseBeforeDelete, 5);
+
+        productViewEventServiceImp.delete(productViewEvent.get());
+
+        int numberOfProductViewEventsAfterDelete = productViewEventServiceImp.findAll().size();
+
+        assertEquals(numberOfProductViewEventsAfterDelete, 4);
 
     }
 
-   /* @Test
-    public  void testIsTopPickClickedProductViewEvent(){
-
-        Set<ProductItem> personalReomendedProductItems = new HashSet<>();
-        personalReomendedProductItems.add(createdProductItem);
-        Set<ProductItem> topPicksProductItems = new HashSet<>();
-        topPicksProductItems.add(createdProductItem);
-
-        ProductViewEvent ProductViewEvent = new ProductViewEvent(2L, createdProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 14, new Date());
-        productViewEventServiceImp.save(ProductViewEvent);
-        System.out.println("Id of top picked ProductViewEvents");
-        productViewEventServiceImp.findTopPickedProductViewEvents().stream().forEach(productViewEvent -> System.out.println(productViewEvent.getId()));
-
-        int numOfTopPickedProductViewEvents = productViewEventServiceImp.findTopPickedProductViewEvents().size();
-
-        assertEquals(numOfTopPickedProductViewEvents,2);
-
-    }*/
 
     @Test
-    public void testIsTopPickedClcket() {
+    public void testIsProductViewEventTopPickClicked() {
 
-        Set<ProductItem> personalReomendedProductItems = new HashSet<>();
-        personalReomendedProductItems.add(createdProductItem);
-        Set<ProductItem> topPicksProductItems = new HashSet<>();
-        topPicksProductItems.add(createdProductItem);
+        Set<ProductViewEvent> topPickedClickedSetofProductViewEvents = productViewEventServiceImp.findAllByIsTopPickClick();
 
-        ProductViewEvent ProductViewEvent = new ProductViewEvent(2L, createdProductItem, false, true, personalReomendedProductItems, topPicksProductItems, 14, new Date());
-        productViewEventServiceImp.save(ProductViewEvent);
-
-        productViewEventServiceImp.findAllByIsTopPickClick(true).stream()
-                .forEach(System.out::println);
+        assertEquals(topPickedClickedSetofProductViewEvents.size(), 4);
 
 
     }
 
     @Test
-    public void testByPromotionId() {
-        Set<Long> ids = productItemRepository.findAll().stream()
-                .filter(productItem -> productItem.getPromotionId() != null).map(productItem -> productItem.getPromotionId())
-                .collect(Collectors.toSet());
-        Map<Long, List<ProductViewEvent>> productViewEventsList = ids.stream()
+    public void testMapingProductViewEventsByPromotionId() {
+        Set<Long> promotionIds = getSetOfPromotionIdFromProductItem();
+        Map<Long, List<ProductViewEvent>> productViewEventsMapByPromotionId = MappedByPromotionIdProductViewEvents(promotionIds);
+
+        assertEquals(productViewEventsMapByPromotionId.get(3l).size(), 1);
+        assertEquals(productViewEventsMapByPromotionId.get(2l).size(), 4);
+
+
+    }
+
+    private Map<Long, List<ProductViewEvent>> MappedByPromotionIdProductViewEvents(Set<Long> promotionIds) {
+        return promotionIds.stream()
                 .collect(Collectors.toMap(aLong -> aLong, aLong -> productViewEventServiceImp.findAllByViewedProductItemPromotionId(aLong)
                         .stream().collect(Collectors.toList())));
+    }
 
-        productViewEventsList.forEach((aLong, productViewEvents) -> System.out.println(productViewEvents));
-
-
+    private Set<Long> getSetOfPromotionIdFromProductItem() {
+        return productItemRepository.findAll().stream()
+                .filter(productItem -> productItem.getPromotionId() != null).map(productItem -> productItem.getPromotionId())
+                .collect(Collectors.toSet());
     }
 
 
