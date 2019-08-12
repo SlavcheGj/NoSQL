@@ -39,8 +39,7 @@ public class CustomRedisHashTest {
         gson = new Gson();
         productViewEventServiceImp.findAll().stream().forEach(productViewEvent -> {
             customeRedisHashRepository.AddKeyValueForSortedSet(productViewEvent);
-            /*            System.out.println(productViewEvent.getId()+" "+productViewEvent.getDateTimeViewed().getTime());
-             */
+                        System.out.println(productViewEvent.getId()+" "+productViewEvent.getDateTimeViewed().getTime());
         });
 
 
@@ -51,7 +50,7 @@ public class CustomRedisHashTest {
 
         Optional<ProductViewEvent> elementFromSortedSetByScore = getElementByScore();
         System.out.println(gson.toJson(elementFromSortedSetByScore.get()));
-        assertEquals("Test passed!", elementFromSortedSetByScore.get().getDateTimeViewed().getTime(), 1565527195331d, 0.1d);
+        assertEquals("Test passed!", elementFromSortedSetByScore.get().getDateTimeViewed().getTime(), 1565595216167d, 0.1d);
 
     }
 
@@ -76,11 +75,11 @@ public class CustomRedisHashTest {
     public void TestCountOfMembersFromSet() {
 
         Long numberOfElementsInSortedSet = customeRedisHashRepository.countMembers();
-        //assertEquals(numberOfElementsInSortedSet,5);
+        assertEquals(numberOfElementsInSortedSet.longValue(),5);
     }
 
     private Optional<ProductViewEvent> getElementByScore() {
-        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565527195331d).stream().findFirst();
+        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565595216167d).stream().findFirst();
     }
 
 }
