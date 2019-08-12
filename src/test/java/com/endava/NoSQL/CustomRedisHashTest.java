@@ -32,11 +32,10 @@ public class CustomRedisHashTest {
     @Autowired
     CustomRedisHashRepository customeRedisHashRepository;
 
-    private Gson gson;
+
 
     @Before
     public void setUp() {
-        gson = new Gson();
         productViewEventServiceImp.findAll().stream().forEach(productViewEvent -> {
             customeRedisHashRepository.AddKeyValueForSortedSet(productViewEvent);
                         System.out.println(productViewEvent.getId()+" "+productViewEvent.getDateTimeViewed().getTime());
@@ -49,8 +48,8 @@ public class CustomRedisHashTest {
     public void TestGetRangeByScoreFromSet() {
 
         Optional<ProductViewEvent> elementFromSortedSetByScore = getElementByScore();
-        System.out.println(gson.toJson(elementFromSortedSetByScore.get()));
-        assertEquals("Test passed!", elementFromSortedSetByScore.get().getDateTimeViewed().getTime(), 1565595216167d, 0.1d);
+        System.out.println(elementFromSortedSetByScore.get());
+        assertEquals(elementFromSortedSetByScore.get().getId().longValue(), 1);
 
     }
 
@@ -79,7 +78,7 @@ public class CustomRedisHashTest {
     }
 
     private Optional<ProductViewEvent> getElementByScore() {
-        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565595216167d).stream().findFirst();
+        return customeRedisHashRepository.getElementFromSortedSetByScore(0d, 1565621238186d).stream().findFirst();
     }
 
 }

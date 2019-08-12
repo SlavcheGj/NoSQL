@@ -2,6 +2,7 @@ package com.endava.NoSQL.Repository;
 
 import com.endava.NoSQL.Model.Product;
 import com.endava.NoSQL.Model.ProductViewEvent;
+import com.google.gson.JsonElement;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;

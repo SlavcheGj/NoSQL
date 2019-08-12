@@ -4,6 +4,8 @@ import com.endava.NoSQL.Model.Product;
 import com.endava.NoSQL.Model.ProductViewEvent;
 import com.endava.NoSQL.Repository.CustomRedisHashRepository;
 import com.endava.NoSQL.Services.ProductViewEventServiceImp;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -28,12 +30,12 @@ public class CustomeRedisHashRepositoryImpl implements CustomRedisHashRepository
 
     @Autowired
     private ZSetOperations<String,Object> zSetOperation;
-
+    private Gson gson;
 
     @Override
     public boolean AddKeyValueForSortedSet(ProductViewEvent productViewEvent) {
-
-        return zSetOperation.add(KEY_FOR_SORTED_SET,productViewEvent,productViewEvent.getDateTimeViewed().getTime());
+        gson = new Gson();
+        return zSetOperation.add(KEY_FOR_SORTED_SET,gson.toJson(productViewEvent),productViewEvent.getDateTimeViewed().getTime());
     }
 
     @Override
@@ -42,7 +44,7 @@ public class CustomeRedisHashRepositoryImpl implements CustomRedisHashRepository
         if(valueByRange == null){
             return new HashSet<ProductViewEvent>();
         }else{
-            return valueByRange.stream().map(o -> (ProductViewEvent)o).collect(Collectors.toSet());
+            return valueByRange.stream().map(o -> gson.fromJson((String) o, ProductViewEvent.class)).collect(Collectors.toSet());
         }
     }
 
@@ -53,14 +55,14 @@ public class CustomeRedisHashRepositoryImpl implements CustomRedisHashRepository
         if(valueByRange == null){
             return new HashSet<ProductViewEvent>();
         }else{
-            return valueByRange.stream().map(o -> (ProductViewEvent)o).collect(Collectors.toSet());
+            return valueByRange.stream().map(o -> gson.fromJson((String)o, ProductViewEvent.class)).collect(Collectors.toSet());
         }
     }
 
     @Override
     public Long removeReturnedFromSetByLowestScore() {
         ProductViewEvent productViewEvent = new ArrayList<>(getByRange(0L, 0L)).get(0);
-        return zSetOperation.remove(KEY_FOR_SORTED_SET,productViewEvent);
+        return zSetOperation.remove(KEY_FOR_SORTED_SET,gson.toJson(productViewEvent));
     }
 
     @Override
